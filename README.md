@@ -31,3 +31,5 @@ Ensure you have [Node.js](https://nodejs.org/) installed (v16+ recommended).
 Navigate to the project root directory in your terminal and execute:
 ```bash
 npm install
+npm start
+
