@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="hu" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JanCheese</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cheese: {
+                            400: '#fbbf24', // sárga akcentus
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        dark: {
+                            900: '#111827',
+                            950: '#030712',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+        
+        body {
+            background-color: #030712; /* dark-950 */
+            color: #f3f4f6; /* gray-100 */
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d97706; 
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+        }
+
+        /* Number input nyilak elrejtése - opcionális, de letisztultabb */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button {  
+           opacity: 1;
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-gray-800 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img src="image_adabeb.png" alt="JanCheese Logo" class="w-12 h-12 rounded-full object-cover border-2 border-cheese-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                    <span class="font-serif text-2xl font-bold tracking-wider text-white">Jan<span class="text-cheese-500">Cheese</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#kinalat" class="text-gray-300 hover:text-cheese-500 transition font-medium">Kínálatunk</a>
+                    <a href="#piacok" class="text-gray-300 hover:text-cheese-500 transition font-medium">Piacok</a>
+                    <a href="#rendeles" class="text-gray-300 hover:text-cheese-500 transition font-medium">Rendelés</a>
+                    <div class="relative cursor-pointer group" onclick="toggleCart()">
+                        <i class="fa-solid fa-cart-shopping text-xl text-gray-300 group-hover:text-cheese-500 transition"></i>
+                        <span id="cart-badge" class="absolute -top-2 -right-2 bg-cheese-500 text-dark-950 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <div class="relative cursor-pointer" onclick="toggleCart()">
+                        <i class="fa-solid fa-cart-shopping text-xl text-gray-300"></i>
+                        <span id="cart-badge-mobile" class="absolute -top-2 -right-2 bg-cheese-500 text-dark-950 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </div>
+                    <button class="text-gray-300 hover:text-cheese-500 focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-900 border-b border-gray-800">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#kinalat" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Kínálatunk</a>
+                <a href="#piacok" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Piacok</a>
+                <a href="#rendeles" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Rendelés</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex-grow flex items-center">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-900/90 to-transparent z-10"></div>
+            <!-- Mock background pattern for premium feel -->
+            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CgkJPHBhdGggZD0iTTAgMGg0MHY0MEgwVjB6IiBmaWxsPSJub25lIi8+CgkJPHBhdGggZD0iTTIwIDIwYy0xMS4wNDYgMC0yMC04Ljk1NC0yMC0yMHM4Ljk1NC0yMCAyMC0yMCAyMCA4Ljk1NCAyMCAyMC04Ljk1NCAyMC0yMCAyMHptMC0zMWMtNi4wNzUgMC0xMSA0LjkyNS0xMSAxMXM0LjkyNSAxMSAxMSAxMSAxMS00LjkyNSAxMS0xMS00LjkyNS0xMS0xMS0xMXoiIGZpbGw9IiNmNWZlMGIiIGZpbGwtb3BhY2l0eT0iMC4xIi8+Cgk8L3N2Zz4=')] z-0"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+            <div class="text-center md:text-left md:w-2/3 lg:w-1/2">
+                <span class="text-cheese-500 font-semibold tracking-wider uppercase text-sm mb-4 block">Kézműves Minőség</span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6 text-white">
+                    Sajt nélkül lehet élni,<br>
+                    <span class="text-cheese-400 italic">de nem érdemes...</span>
+                </h1>
+                <p class="text-lg text-gray-400 mb-8 font-light">
+                    Kézműves sajtok, friss körözött, tojáskrém, padlizsánkrém és prémium tejtermékek. Vedd át személyesen a piacokon, vagy kérj házhozszállítást!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="#kinalat" class="bg-cheese-500 hover:bg-cheese-600 text-dark-950 font-bold py-3 px-8 rounded-full transition shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+                        Rendelés indítása
+                    </a>
+                    <a href="#piacok" class="bg-transparent border border-gray-600 hover:border-cheese-500 hover:text-cheese-500 text-white font-medium py-3 px-8 rounded-full transition">
+                        Piaci nyitvatartás
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Markets Info Banner -->
+    <div class="bg-dark-900 border-y border-gray-800" id="piacok">
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-serif font-bold text-white mb-2">Találkozzunk a Piacokon!</h2>
+                <p class="text-gray-400">Kóstolj bele a kínálatba személyesen, az alábbi helyszíneken.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Piac 1 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-cheese-500/50 transition group">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-cheese-500/20 transition">
+                        <i class="fa-solid fa-location-dot text-cheese-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Gyáli piac</h3>
+                    <p class="text-gray-400 text-sm"><i class="fa-regular fa-clock mr-2"></i>Vasárnap</p>
+                    <p class="text-cheese-400 font-semibold mt-1">6:00 - 11:30</p>
+                </div>
+                <!-- Piac 2 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-cheese-500/50 transition group">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-cheese-500/20 transition">
+                        <i class="fa-solid fa-location-dot text-cheese-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Bikás piac <span class="text-xs text-gray-500 font-normal">(11. ker)</span></h3>
+                    <p class="text-gray-400 text-sm"><i class="fa-regular fa-clock mr-2"></i>Szombat</p>
+                    <p class="text-cheese-400 font-semibold mt-1">6:00 - 12:00</p>
+                </div>
+                <!-- Piac 3 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-cheese-500/50 transition group">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-cheese-500/20 transition">
+                        <i class="fa-solid fa-location-dot text-cheese-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Lőrinci piac <span class="text-xs text-gray-500 font-normal">(18. ker)</span></h3>
+                    <p class="text-gray-400 text-sm"><i class="fa-regular fa-clock mr-2"></i>Kedd - Szombat</p>
+                    <p class="text-cheese-400 font-semibold mt-1">6:00 - 16:00</p>
+                </div>
+                <!-- Piac 4 -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-cheese-500/50 transition group">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-cheese-500/20 transition">
+                        <i class="fa-solid fa-location-dot text-cheese-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Kispesti piac <span class="text-xs text-gray-500 font-normal">(19. ker)</span></h3>
+                    <p class="text-gray-400 text-sm"><i class="fa-regular fa-clock mr-2"></i>Szerda - Szombat</p>
+                    <p class="text-cheese-400 font-semibold mt-1">6:00 - 13:00 <span class="text-xs text-gray-500">(nyár)</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <section class="py-20" id="kinalat">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <span class="text-cheese-500 font-semibold tracking-wider uppercase text-sm block mb-2">Kóstold meg</span>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-white">Kiemelt Kínálatunk</h2>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-list">
+                <!-- Products will be injected here by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-gray-800 pt-16 pb-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="image_adabeb.png" alt="JanCheese Logo" class="w-10 h-10 rounded-full object-cover border border-cheese-500">
+                        <span class="font-serif text-xl font-bold text-white">Jan<span class="text-cheese-500">Cheese</span></span>
+                    </div>
+                    <p class="text-gray-400 italic mb-6">"Sajt nélkül lehet élni, de nem érdemes.."</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">Kapcsolat</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-user text-cheese-500"></i>
+                            <span>János</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-cheese-500"></i>
+                            <a href="tel:+36303483902" class="hover:text-cheese-400 transition">+36 30 348 3902</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">Közösségi Média</h4>
+                    <div class="flex flex-col space-y-4">
+                        <a href="https://tiktok.com/@Jancheese8" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 text-gray-400 hover:text-white transition group">
+                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-cheese-500 group-hover:text-dark-950 transition">
+                                <i class="fa-brands fa-tiktok"></i>
+                            </div>
+                            <span>@Jancheese8</span>
+                        </a>
+                        <a href="https://www.facebook.com/profile.php?id=61553802566738" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 text-gray-400 hover:text-white transition group">
+                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-cheese-500 group-hover:text-dark-950 transition">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </div>
+                            <span>JanCheese Facebook</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2026 JanCheese. Minden jog fenntartva.</p>
+                <p class="mt-2 md:mt-0">Fizetés: Utólag, készpénzzel vagy kártyával.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart / Checkout Modal (Hidden by default) -->
+    <div id="cart-modal" class="fixed inset-0 z-[100] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleCart()"></div>
+        
+        <!-- Drawer -->
+        <div class="absolute inset-y-0 right-0 max-w-full w-full md:w-[500px] bg-dark-900 border-l border-gray-800 shadow-2xl flex flex-col h-full overflow-hidden transform translate-x-full transition-transform duration-300" id="cart-drawer">
+            
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-dark-950">
+                <h2 class="text-xl font-serif font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-basket-shopping text-cheese-500"></i> Rendelés
+                </h2>
+                <button onclick="toggleCart()" class="text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Cart Content (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                <!-- Empty state -->
+                <div id="empty-cart-msg" class="text-center py-12 text-gray-500 hidden">
+                    <i class="fa-solid fa-cheese text-4xl mb-4 opacity-50"></i>
+                    <p>A kosarad jelenleg üres.</p>
+                </div>
+
+                <!-- Items list -->
+                <div id="cart-items-container" class="space-y-4 mb-8">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- Checkout Form -->
+                <div id="checkout-form-container" class="hidden border-t border-gray-800 pt-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Szállítási és Fizetési adatok</h3>
+                    
+                    <div class="bg-cheese-500/10 border border-cheese-500/20 rounded-lg p-4 mb-6 flex items-start gap-3">
+                        <i class="fa-solid fa-circle-info text-cheese-500 mt-1"></i>
+                        <p class="text-sm text-gray-300">Az oldalon <strong class="text-white">nincs online fizetés</strong>. A fizetés az átvételkor történik készpénzben vagy bankkártyával.</p>
+                    </div>
+
+                    <form id="order-form" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Név</label>
+                            <input type="text" id="customer-name" required class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 focus:ring-1 focus:ring-cheese-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Telefonszám</label>
+                            <input type="tel" id="customer-phone" required class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 focus:ring-1 focus:ring-cheese-500 transition">
+                        </div>
+
+                        <!-- Delivery Type Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Átvétel módja</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="delivery_type" value="pickup" class="peer sr-only" checked onchange="toggleDeliveryFields()">
+                                    <div class="text-center p-3 rounded-lg border border-gray-700 bg-dark-950 peer-checked:border-cheese-500 peer-checked:bg-cheese-500/10 text-gray-400 peer-checked:text-white transition">
+                                        <i class="fa-solid fa-shop mb-1 block"></i>
+                                        Személyes
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="delivery_type" value="delivery" class="peer sr-only" onchange="toggleDeliveryFields()">
+                                    <div class="text-center p-3 rounded-lg border border-gray-700 bg-dark-950 peer-checked:border-cheese-500 peer-checked:bg-cheese-500/10 text-gray-400 peer-checked:text-white transition">
+                                        <i class="fa-solid fa-truck-fast mb-1 block"></i>
+                                        Házhozszállítás
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Market Selection (Conditional) -->
+                        <div id="pickup-fields">
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Válassz piacot</label>
+                            <select id="market-select" required class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 transition">
+                                <option value="gyali">Gyáli piac (Vasárnap 6:00-11:30)</option>
+                                <option value="bikas">Bikás piac (Szombat 6:00-12:00)</option>
+                                <option value="lorinci">Lőrinci piac (Kedd-Szo 6:00-16:00)</option>
+                                <option value="kispesti">Kispesti piac (Sze-Szo 6:00-13:00)</option>
+                            </select>
+                        </div>
+
+                        <!-- Delivery Address (Conditional) -->
+                        <div id="delivery-fields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Település, Irányítószám</label>
+                                <input type="text" id="address-city" class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Utca, házszám, emelet</label>
+                                <input type="text" id="address-street" class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Megjegyzés (opcionális)</label>
+                            <textarea id="order-notes" rows="2" class="w-full bg-dark-950 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cheese-500 transition"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer / Total -->
+            <div class="border-t border-gray-800 bg-dark-950 p-6">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-gray-400">Várható végösszeg:</span>
+                    <span class="text-2xl font-bold text-cheese-400" id="cart-total-price">0 Ft</span>
+                </div>
+                <p class="text-xs text-gray-500 mb-4 text-right">*A pontos ár a mérés után dől el.</p>
+                <!-- Figyeld a type="button"-t, így tudjuk JS-ből kontrollálni a form validációt! -->
+                <button type="button" id="submit-order-btn" onclick="submitOrder()" class="w-full bg-cheese-500 hover:bg-cheese-600 text-dark-950 font-bold py-3.5 px-4 rounded-xl transition flex justify-center items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    <span>Rendelés leadása</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert / Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-[150] bg-dark-800 border-l-4 border-cheese-500 text-white px-6 py-4 rounded shadow-2xl glass-panel hidden">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-check-circle text-cheese-500 text-xl"></i>
+            <span id="toast-message">Sikeres művelet!</span>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Data Store
+        const products = [
+            { id: 1, name: 'Házi Körözött', desc: 'Hagyományos recept alapján, friss tehéntúróból és válogatott fűszerekből.', price: 2670, unit: 'doboz', type: 'krém', basePrice: '890', baseUnit: 'Ft / 10 dkg', boxText: '1 doboz (~30 dkg) kb. 2 670 Ft' },
+            { id: 2, name: 'Krémes Tojáskrém', desc: 'Háztáji tojásból, lágy vajjal és csipetnyi mustárral.', price: 2834, unit: 'doboz', type: 'krém', basePrice: '1 090', baseUnit: 'Ft / 10 dkg', boxText: '1 doboz (~25-27 dkg) kb. 2 834 Ft' },
+            { id: 3, name: 'Füstölt Padlizsánkrém', desc: 'Parázson sült padlizsánból, igazi erdélyi ízvilág.', price: 2834, unit: 'doboz', type: 'krém', basePrice: '1 090', baseUnit: 'Ft / 10 dkg', boxText: '1 doboz (~25-27 dkg) kb. 2 834 Ft' },
+            { id: 4, name: 'Milánói szalámi', desc: 'Eredeti olasz receptúra alapján készült, lassan érlelt prémium szalámi.', price: 1190, unit: '10 dkg', type: 'hús', basePrice: '1 190', baseUnit: 'Ft / 10 dkg' },
+            { id: 5, name: 'Füstölt Parenyica', desc: 'Bükkfán füstölt, hagyományosan tekert felvidéki klasszikus.', price: 1190, unit: '10 dkg', type: 'sajt', basePrice: '1 190', baseUnit: 'Ft / 10 dkg' },
+            { id: 6, name: 'Lilahagymás Gomolya', desc: 'Különleges ízélmény, friss lilahagyma darabokkal gazdagítva.', price: 1090, unit: '10 dkg', type: 'sajt', basePrice: '1 090', baseUnit: 'Ft / 10 dkg' }
+        ];
+
+        let cart = [];
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartUI();
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 20) {
+                    nav.classList.add('shadow-lg', 'bg-dark-900/95');
+                    nav.classList.remove('glass-panel');
+                } else {
+                    nav.classList.remove('shadow-lg', 'bg-dark-900/95');
+                    nav.classList.add('glass-panel');
+                }
+            });
+        });
+
+        // Render Products
+        function renderProducts() {
+            const container = document.getElementById('product-list');
+            container.innerHTML = products.map(product => `
+                <div class="glass-panel rounded-2xl overflow-hidden border border-gray-800 hover:border-cheese-500/30 transition-all duration-300 group flex flex-col h-full">
+                    <div class="h-48 bg-dark-800 relative overflow-hidden flex items-center justify-center">
+                        <i class="fa-solid ${product.type === 'sajt' ? 'fa-cheese' : (product.type === 'krém' ? 'fa-jar' : 'fa-bacon')} text-6xl text-gray-700 group-hover:text-cheese-500/20 transition duration-500 transform group-hover:scale-110"></i>
+                        <div class="absolute top-4 right-4 bg-dark-950/80 backdrop-blur text-cheese-400 text-xs font-bold px-3 py-1 rounded-full border border-cheese-500/30">
+                            ${product.unit}
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold text-white mb-2">${product.name}</h3>
+                        <p class="text-gray-400 text-sm mb-6 flex-grow">${product.desc}</p>
+                        
+                        <div class="flex flex-col xl:flex-row xl:items-end justify-between mt-auto gap-4">
+                            <div>
+                                ${product.basePrice ? `
+                                    <span class="text-2xl font-bold text-white">${product.basePrice} <span class="text-sm font-normal text-gray-400">${product.baseUnit}</span></span>
+                                    ${product.boxText ? `<p class="text-xs text-cheese-400 mt-1">${product.boxText}</p>` : ''}
+                                ` : `
+                                    <span class="text-2xl font-bold text-white">${product.price.toLocaleString('hu-HU')} <span class="text-sm font-normal text-gray-400">Ft</span></span>
+                                `}
+                            </div>
+                            
+                            <!-- Súly/Darab választó és gomb -->
+                            <div class="flex items-center gap-1 bg-dark-950 p-1 rounded-full border border-gray-700 self-start xl:self-auto shadow-inner">
+                                <input type="number" id="qty-${product.id}"
+                                    class="w-16 h-8 bg-transparent text-white font-bold px-1 text-center focus:outline-none"
+                                    value="${product.unit === 'doboz' ? '1' : '10'}"
+                                    step="${product.unit === 'doboz' ? '1' : '10'}"
+                                    min="${product.unit === 'doboz' ? '1' : '10'}">
+                                <span class="text-sm text-gray-400 pr-2">${product.unit === 'doboz' ? 'db' : 'dkg'}</span>
+                                <button onclick="addToCart(${product.id})" class="w-9 h-9 rounded-full bg-cheese-500 hover:bg-cheese-600 text-dark-950 flex items-center justify-center transition shadow-lg shrink-0 cursor-pointer">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Logic
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const qtyInput = document.getElementById(`qty-${productId}`);
+            const qtyToAdd = parseInt(qtyInput.value);
+            
+            // Hibás bevitel (pl. negatív szám, szöveg) megakadályozása
+            if (isNaN(qtyToAdd) || qtyToAdd <= 0) {
+                showToast('Kérjük adj meg érvényes mennyiséget!');
+                return;
+            }
+
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += qtyToAdd;
+            } else {
+                cart.push({ ...product, quantity: qtyToAdd });
+            }
+            
+            // Mező visszaállítása alapértékre
+            qtyInput.value = product.unit === 'doboz' ? '1' : '10';
+
+            updateCartUI();
+            showToast(`${qtyToAdd} ${product.unit === 'doboz' ? 'doboz' : 'dkg'} ${product.name} a kosárba került!`);
+        }
+
+        // Delta értéke 1 vagy -1, attól függően, hogy növelünk vagy csökkentünk. 
+        // Doboz esetén ezt 1-esével, súlyos esetén 10 dkg-osával tesszük.
+        function updateQuantity(productId, deltaSign) {
+            const itemIndex = cart.findIndex(item => item.id === productId);
+            if (itemIndex > -1) {
+                const item = cart[itemIndex];
+                const changeAmount = item.unit === 'doboz' ? deltaSign : deltaSign * 10;
+                
+                item.quantity += changeAmount;
+                if (item.quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            // Badges
+            // Bár most súly/darab is lehet a quantity-ben, badge-ben talán az egyedi tételek száma logikusabb
+            const uniqueItemsCount = cart.length; 
+            const badges = [document.getElementById('cart-badge'), document.getElementById('cart-badge-mobile')];
+            
+            badges.forEach(badge => {
+                if (uniqueItemsCount > 0) {
+                    badge.textContent = uniqueItemsCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+
+            // Cart Modal Content
+            const container = document.getElementById('cart-items-container');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const checkoutForm = document.getElementById('checkout-form-container');
+            const submitBtn = document.getElementById('submit-order-btn');
+            
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = '';
+                emptyMsg.classList.remove('hidden');
+                checkoutForm.classList.add('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                emptyMsg.classList.add('hidden');
+                checkoutForm.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                container.innerHTML = cart.map(item => {
+                    const isBox = item.unit === 'doboz';
+                    // Doboz esetén a megadott (magasabb) price érvényes. 
+                    // Súly alapú (10dkg) esetén a price-t elosztjuk 10-el, hogy megkapjuk 1 dkg árát.
+                    const exactItemPrice = isBox ? item.price : (item.price / 10);
+                    const itemTotal = exactItemPrice * item.quantity;
+                    
+                    totalPrice += itemTotal;
+                    
+                    return `
+                        <div class="flex items-center gap-4 bg-dark-950 p-3 rounded-xl border border-gray-800">
+                            <div class="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid ${item.type === 'sajt' ? 'fa-cheese' : (item.type === 'krém' ? 'fa-jar' : 'fa-bacon')} text-gray-500"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="text-white text-sm font-bold">${item.name}</h4>
+                                <div class="text-cheese-400 text-sm font-medium">${Math.round(itemTotal).toLocaleString('hu-HU')} Ft</div>
+                            </div>
+                            <div class="flex items-center gap-1 bg-dark-900 rounded-lg p-1 border border-gray-800 shrink-0">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span class="text-white text-sm w-12 text-center font-semibold">${item.quantity} <span class="text-[10px] text-gray-400 font-normal">${isBox ? 'db' : 'dkg'}</span></span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('cart-total-price').textContent = `${Math.round(totalPrice).toLocaleString('hu-HU')} Ft`;
+        }
+
+        // UI Interactions
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            const drawer = document.getElementById('cart-drawer');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                // Trigger reflow
+                void modal.offsetWidth;
+                drawer.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+        }
+
+        function toggleDeliveryFields() {
+            const type = document.querySelector('input[name="delivery_type"]:checked').value;
+            const pickupFields = document.getElementById('pickup-fields');
+            const deliveryFields = document.getElementById('delivery-fields');
+            const marketSelect = document.getElementById('market-select');
+            const cityInput = document.getElementById('address-city');
+            const streetInput = document.getElementById('address-street');
+            
+            if (type === 'pickup') {
+                pickupFields.classList.remove('hidden');
+                deliveryFields.classList.add('hidden');
+                
+                marketSelect.setAttribute('required', 'required');
+                cityInput.removeAttribute('required');
+                streetInput.removeAttribute('required');
+            } else {
+                pickupFields.classList.add('hidden');
+                deliveryFields.classList.remove('hidden');
+                
+                marketSelect.removeAttribute('required');
+                cityInput.setAttribute('required', 'required');
+                streetInput.setAttribute('required', 'required');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        // Order Submission
+        async function submitOrder() {
+            const form = document.getElementById('order-form');
+            
+            // Kötelező űrlapmezők szigorú ellenőrzése
+            if (!form.checkValidity()) {
+                form.reportValidity(); 
+                return;
+            }
+
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const deliveryType = document.querySelector('input[name="delivery_type"]:checked').value;
+            
+            const orderData = {
+                customer: { name, phone },
+                delivery: {
+                    type: deliveryType,
+                    details: deliveryType === 'pickup' 
+                        ? { market: document.getElementById('market-select').value }
+                        : { 
+                            city: document.getElementById('address-city').value, 
+                            street: document.getElementById('address-street').value 
+                          }
+                },
+                notes: document.getElementById('order-notes').value,
+                items: cart,
+                total: cart.reduce((sum, item) => sum + ((item.unit === 'doboz' ? item.price : item.price/10) * item.quantity), 0)
+            };
+
+            const btn = document.getElementById('submit-order-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Feldolgozás...';
+            btn.disabled = true;
+
+            try {
+                
+                console.log("[Frontend] Kérés küldése ide:", 'http://localhost:10000/api/orders');
+
+const response = await fetch('http://localhost:10000/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData)
+});
+                console.log("[Frontend] Szerver válasz státusz:", response.status);
+
+                if (response.ok) {
+                    const responseData = await response.json();
+                    console.log("[Frontend] Szerver válasz adatok:", responseData);
+                    
+                    toggleCart();
+                    cart = [];
+                    updateCartUI();
+                    document.getElementById('order-form').reset();
+                    toggleDeliveryFields(); 
+                    showToast('Rendelés sikeresen elküldve! Hamarosan keresünk.');
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Szerver hiba: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('[Frontend Hiba] Nem sikerült a rendelés:', error);
+                alert(`Hiba történt a rendelés során: ${error.message}\nEllenőrizd a böngésző konzolját (F12)!`);
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
